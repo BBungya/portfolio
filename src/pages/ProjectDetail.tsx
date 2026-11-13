@@ -110,11 +110,13 @@ export default function ProjectDetail() {
         </section>
 
         <div className="p-links">
-          <a className="pill fill" href={p.links.repo} target="_blank" rel="noreferrer">
-            GitHub 저장소
-          </a>
+          {p.links.repo && (
+            <a className="pill fill" href={p.links.repo} target="_blank" rel="noreferrer">
+              GitHub 저장소
+            </a>
+          )}
           {p.links.demo && (
-            <a className="pill" href={p.links.demo} target="_blank" rel="noreferrer">
+            <a className={`pill ${p.links.repo ? '' : 'fill'}`} href={p.links.demo} target="_blank" rel="noreferrer">
               {p.links.demoLabel || '데모 보기'}
             </a>
           )}

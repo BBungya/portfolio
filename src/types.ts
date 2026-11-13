@@ -44,7 +44,8 @@ export interface Defects {
 }
 
 export interface ProjectLinks {
-  repo: string;
+  /** GitHub 저장소가 없으면 null (데모 버튼만 보여요) */
+  repo: string | null;
   demo: string | null;
   demoLabel?: string;
 }

@@ -70,7 +70,7 @@ export const CAPSULES: Capsule[] = [
       rows: [['0 또는 음수 포인트 거절 조건 제거', 3], ['중복 수집 방지 조건 제거', 1], ['템플릿 기본 등급 오류', 1], ['포인트 출처 ID 누락', 1], ['연락처 축 변경', 1]],
       note: 'Mock의 null 반환으로 생긴 우연한 예외를 없애고 엔티티를 반환하도록 고쳤어요. XML 파서와 실패 집계도 회귀 사례로 확인했어요.',
     },
-    links: { repo: 'https://github.com/BBungya', demo: null },
+    links: { repo: 'https://github.com/HanaDoody/doody-backend', demo: null },
   },
   {
     id: 'sign',
@@ -123,7 +123,7 @@ export const CAPSULES: Capsule[] = [
         ],
       },
     ],
-    links: { repo: 'https://github.com/BBungya', demo: null },
+    links: { repo: 'https://github.com/dongnae-bangnae/BE', demo: null },
   },
   {
     id: 'cat',
@@ -146,7 +146,7 @@ export const CAPSULES: Capsule[] = [
       ['내가 맡은 일', '시작 화면, 로그인·회원가입, 홈, 커뮤니티 게시판, 마이페이지를 구현하고 API와 연동했어요. 기능별 완료 여부를 점검하며 일정도 관리했어요.'],
       ['결과와 배운 점', '데모데이 이후에도 출시 작업을 이어가 Google Play 심사를 진행하고 있어요 (2026.10 기준).'],
     ],
-    links: { repo: 'https://github.com/BBungya', demo: null },
+    links: { repo: 'https://github.com/DogCatSquare/FE', demo: null },
   },
   {
     id: 'card',
@@ -221,7 +221,7 @@ export const CAPSULES: Capsule[] = [
       ['내가 맡은 일', '칵테일 제조와 상점 기능을 구현했어요.'],
       ['결과와 배운 점', 'Google Play 스토어에 출시했어요.'],
     ],
-    links: { repo: 'https://github.com/BBungya', demo: 'https://play.google.com/store/apps/details?id=ddwu.npc.shaking', demoLabel: 'Google Play에서 보기' },
+    links: { repo: null, demo: 'https://play.google.com/store/apps/details?id=ddwu.npc.shaking', demoLabel: 'Google Play에서 보기' },
   },
   {
     id: 'about',

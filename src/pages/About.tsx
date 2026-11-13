@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Nav from '../components/Nav';
+import { BLOG, EMAIL, GITHUB, LINKEDIN } from '../data/profile';
 import '../styles/about.css';
 
 const SKILLS: [area: string, list: string][] = [
@@ -67,13 +68,16 @@ export default function About() {
             사용자의 문제와 서비스 흐름까지 생각하며 구조를 설계해요.
           </p>
           <div className="a-links">
-            <a className="pill fill" href="mailto:leesoyeon.dev@gmail.com">
-              leesoyeon.dev@gmail.com
+            <a className="pill fill" href={`mailto:${EMAIL}`}>
+              {EMAIL}
             </a>
-            <a className="pill" href="https://github.com/BBungya" target="_blank" rel="noreferrer">
+            <a className="pill" href={GITHUB} target="_blank" rel="noreferrer">
               GitHub
             </a>
-            <a className="pill" href="https://sylee111.tistory.com" target="_blank" rel="noreferrer">
+            <a className="pill" href={LINKEDIN} target="_blank" rel="noreferrer">
+              LinkedIn
+            </a>
+            <a className="pill" href={BLOG} target="_blank" rel="noreferrer">
               Blog
             </a>
           </div>
@@ -82,7 +86,6 @@ export default function About() {
         <div className="a-blocks">
           <Block label="Education">
             <Line title="동덕여자대학교 컴퓨터학과" meta="2022.03 – 2027.02 (예정) · 학점 3.48 / 4.5" />
-            <Line title="와부고등학교" meta="2019.03 – 2022.01" />
           </Block>
 
           <Block label="Skills">

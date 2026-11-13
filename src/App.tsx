@@ -4,6 +4,7 @@ import type { CapsuleId, Collected } from './types';
 import Gacha from './pages/Gacha';
 import ProjectDetail from './pages/ProjectDetail';
 import About from './pages/About';
+import Footer from './components/Footer';
 
 /** 열어본 캡슐 목록 — 페이지를 오가도 유지되고, 새로고침해도 기억해요. */
 interface CollectionValue {
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="/about" element={<About />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
     </CollectionContext.Provider>
   );
 }

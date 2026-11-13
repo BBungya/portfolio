@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { GITHUB, LINKEDIN } from '../data/profile';
 
 interface NavProps {
   home?: boolean;
@@ -54,8 +55,11 @@ export default function Nav({ home = false, children }: NavProps) {
         <NavLink to="/about" className={cls}>
           About
         </NavLink>
-        <a href="https://github.com/BBungya" target="_blank" rel="noreferrer">
+        <a href={GITHUB} target="_blank" rel="noreferrer">
           GitHub
+        </a>
+        <a href={LINKEDIN} target="_blank" rel="noreferrer">
+          LinkedIn
         </a>
       </nav>
     </header>

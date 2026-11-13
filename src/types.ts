@@ -43,6 +43,28 @@ export interface Defects {
   note: string;
 }
 
+/** 기획이 바뀐 지점: 무엇에서 무엇으로, 왜, 개발에선 어떻게 반영했는지 */
+export interface Pivot {
+  title: string;
+  /** [대상, 방향] */
+  before: [target: string, direction: string];
+  after: [target: string, direction: string];
+  reason: string;
+  applied: string;
+}
+
+/** 구현하면서 내린 판단 하나 */
+export interface DecisionCase {
+  title: string;
+  problem: string;
+  choice: string;
+  steps: string[];
+  /** 구현한 범위의 한계 (과장하지 않도록) */
+  scope?: string;
+  /** 근거 커밋 등 */
+  evidence?: string;
+}
+
 export interface ProjectLinks {
   /** GitHub 저장소가 없으면 null (데모 버튼만 보여요) */
   repo: string | null;
@@ -75,6 +97,8 @@ export interface ProjectCapsule extends CapsuleBase {
   archImg?: string;
   flows?: FlowDiagram[];
   defects?: Defects;
+  pivot?: Pivot;
+  cases?: DecisionCase[];
   shots?: Shot[];
   shotFrame?: boolean;
 }

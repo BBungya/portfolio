@@ -1,6 +1,6 @@
 /* 자세히 보기 페이지의 시각 자료: 수치, 아키텍처, 흐름도, 결함 탐지표.
    데이터는 src/data/capsules.ts 의 stats / arch / flows / defects 에서 와요. */
-import type { Arch, Defects, FlowDiagram, Stat, StyleWithVars } from '../types';
+import type { Arch, DecisionCase, Defects, FlowDiagram, Pivot, Stat, StyleWithVars } from '../types';
 
 /** --accent CSS 변수로 프로젝트 색을 넘겨요. */
 const accent = (color: string, extra: Record<`--${string}`, string | number> = {}): StyleWithVars => ({ '--accent': color, ...extra });
@@ -152,6 +152,80 @@ export function DefectTable({ defects, color }: { defects: Defects; color: strin
           ))}
         </tbody>
       </table>
+    </section>
+  );
+}
+
+export function PivotBlock({ pivot, color }: { pivot: Pivot; color: string }) {
+  return (
+    <section className="f-block" aria-label={pivot.title}>
+      <p className="f-kicker">Pivot</p>
+      <h2 className="f-title">{pivot.title}</h2>
+      <div className="pivot" style={accent(color)}>
+        <div className="pivot-side before">
+          <span className="muted small">처음</span>
+          <span className="pivot-target">{pivot.before[0]}</span>
+          <span className="pivot-dir">{pivot.before[1]}</span>
+        </div>
+        <span className="pivot-arrow" aria-hidden="true">
+          →
+        </span>
+        <div className="pivot-side after">
+          <span className="muted small">바꾼 뒤</span>
+          <span className="pivot-target">{pivot.after[0]}</span>
+          <span className="pivot-dir">{pivot.after[1]}</span>
+        </div>
+      </div>
+      <dl className="f-checks">
+        <div>
+          <dt>바꾼 이유</dt>
+          <dd>{pivot.reason}</dd>
+        </div>
+        <div>
+          <dt>개발에 반영</dt>
+          <dd>{pivot.applied}</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
+export function DecisionCases({ cases, color }: { cases: DecisionCase[]; color: string }) {
+  return (
+    <section className="f-block" aria-label="구현하며 내린 판단">
+      <p className="f-kicker">Decisions</p>
+      <h2 className="f-title">구현하며 내린 판단</h2>
+      <ol className="cases" style={accent(color)}>
+        {cases.map((c, i) => (
+          <li key={c.title} className="case">
+            <div className="case-head">
+              <span className="case-no">{String(i + 1).padStart(2, '0')}</span>
+              <h3 className="case-title">{c.title}</h3>
+              {c.evidence && <span className="case-ev">{c.evidence}</span>}
+            </div>
+            <dl className="case-body">
+              <dt>상황</dt>
+              <dd>{c.problem}</dd>
+              <dt>판단</dt>
+              <dd>{c.choice}</dd>
+              <dt>구현</dt>
+              <dd>
+                <ul className="case-steps">
+                  {c.steps.map((st) => (
+                    <li key={st}>{st}</li>
+                  ))}
+                </ul>
+              </dd>
+              {c.scope && (
+                <>
+                  <dt>범위</dt>
+                  <dd className="muted">{c.scope}</dd>
+                </>
+              )}
+            </dl>
+          </li>
+        ))}
+      </ol>
     </section>
   );
 }

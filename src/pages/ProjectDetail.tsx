@@ -1,7 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { PROJECTS, byId, capsuleFill } from '../data/capsules';
 import Nav from '../components/Nav';
-import { ArchDiagram, DefectTable, Flow, StatRow } from '../components/ProjectFigures';
+import { ArchDiagram, DecisionCases, DefectTable, Flow, PivotBlock, StatRow } from '../components/ProjectFigures';
 import PhoneFlow from '../components/PhoneFlow';
 import { FLOWS } from '../data/flows';
 import '../styles/project.css';
@@ -76,7 +76,9 @@ export default function ProjectDetail() {
         {proto && <PhoneFlow key={p.id} flow={proto} color={p.colors[1]} />}
 
         {p.stats && <StatRow stats={p.stats} color={p.colors[2]} />}
+        {p.pivot && <PivotBlock pivot={p.pivot} color={p.colors[2]} />}
         {p.arch && <ArchDiagram arch={p.arch} color={p.colors[1]} img={p.archImg} name={p.name} />}
+        {p.cases && <DecisionCases cases={p.cases} color={p.colors[2]} />}
         {p.flows && p.flows.map((f, k) => <Flow key={f.title} flow={f} index={k} color={p.colors[2]} />)}
         {p.defects && <DefectTable defects={p.defects} color={p.colors[2]} />}
 

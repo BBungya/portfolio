@@ -1,4 +1,4 @@
-# Project Gacha — 이소연 포트폴리오
+# 이소연 포트폴리오
 
 캡슐 뽑기 기계로 프로젝트를 소개하는 포트폴리오 사이트예요. Vite + React 18 + TypeScript + React Router.
 

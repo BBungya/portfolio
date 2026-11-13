@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useCollection } from '../App.jsx';
-import { CAPSULES, byId } from '../data/capsules.js';
-import Nav from '../components/Nav.jsx';
-import Capsule from '../components/Capsule.jsx';
-import RevealNote from '../components/RevealNote.jsx';
-import CollectionSheet from '../components/CollectionSheet.jsx';
-import { addBody, createWorld, impulseAround, removeBody, step } from '../lib/physics.js';
+import type { MouseEvent } from 'react';
+import { useCollection } from '../App';
+import { CAPSULES, getCapsule } from '../data/capsules';
+import Nav from '../components/Nav';
+import Capsule from '../components/Capsule';
+import RevealNote from '../components/RevealNote';
+import CollectionSheet from '../components/CollectionSheet';
+import { addBody, createWorld, impulseAround, removeBody, step } from '../lib/physics';
+import type { World } from '../lib/physics';
+import type { CapsuleId } from '../types';
 import '../styles/gacha.css';
 
 /* 기계 치수(px) — gacha.css의 값과 맞춰야 집게가 캡슐을 정확히 잡아요. */
@@ -24,22 +27,36 @@ const CLEAR_GLASS = true;
 
 /** 배경 후보: 'grain' | 'grid' | 'studio' | 'type' | 'pills' | 'orbs'(이전)
  *  주소 뒤에 ?bg=grid 처럼 붙이면 바로 바꿔볼 수 있어요. */
-const BACKGROUND = 'grid';
-const BG_KEYS = ['grain', 'grid', 'studio', 'type', 'pills', 'orbs'];
-const pickBg = () => {
+const BG_KEYS = ['grain', 'grid', 'studio', 'type', 'pills', 'orbs'] as const;
+type Background = (typeof BG_KEYS)[number];
+const BACKGROUND: Background = 'grid';
+const pickBg = (): Background => {
   try {
     const q = new URLSearchParams(window.location.search).get('bg');
-    return BG_KEYS.includes(q) ? q : BACKGROUND;
+    return BG_KEYS.find((k) => k === q) ?? BACKGROUND;
   } catch {
     return BACKGROUND;
   }
 };
 
-const ALL_IDS = CAPSULES.map((c) => c.id);
-const cableFor = (y) => y - BALL / 2 - CARRIAGE - HEAD + OVER; // y: 캡슐 중심
-const clamp = (v) => Math.max(8, Math.min(92, v));
+type Phase = 'idle' | 'busy';
+type Timer = ReturnType<typeof setTimeout>;
 
-const ORBS = [
+const ALL_IDS: CapsuleId[] = CAPSULES.map((c) => c.id);
+const cableFor = (y: number) => y - BALL / 2 - CARRIAGE - HEAD + OVER; // y: 캡슐 중심
+const clamp = (v: number) => Math.max(8, Math.min(92, v));
+
+interface Orb {
+  left?: string;
+  right?: string;
+  top?: string;
+  bottom?: string;
+  size: number;
+  color: string;
+  delay: number;
+}
+
+const ORBS: Orb[] = [
   { left: '6%', top: '12%', size: 260, color: '#8FE0C2', delay: 0 },
   { left: '18%', bottom: '8%', size: 200, color: '#FFB27A', delay: -3 },
   { right: '8%', top: '8%', size: 220, color: '#C3AEFF', delay: -5 },
@@ -56,13 +73,13 @@ export default function Gacha() {
   const [moveMs, setMoveMs] = useState(140);
   const [cable, setCable] = useState(REST);
   const [open, setOpen] = useState(true);
-  const [phase, setPhase] = useState('idle'); // idle | busy
-  const [pile, setPile] = useState(ALL_IDS);
-  const [held, setHeld] = useState(null);
-  const [falling, setFalling] = useState(null);
+  const [phase, setPhase] = useState<Phase>('idle');
+  const [pile, setPile] = useState<CapsuleId[]>(ALL_IDS);
+  const [held, setHeld] = useState<CapsuleId | null>(null);
+  const [falling, setFalling] = useState<CapsuleId | null>(null);
   const [fallTop, setFallTop] = useState(0);
-  const [tray, setTray] = useState([]);
-  const [opened, setOpened] = useState(null);
+  const [tray, setTray] = useState<CapsuleId[]>([]);
+  const [opened, setOpened] = useState<CapsuleId | null>(null);
   const [showCol, setShowCol] = useState(false);
 
   /* 좁은 화면에선 기계를 통째로 축소 (캡슐 배치가 px 기준이라 비율을 유지하려고) */
@@ -75,8 +92,8 @@ export default function Gacha() {
   }, []);
 
   /* ───── 물리: 캡슐마다 위치·속도를 가지고, 화면엔 transform으로만 반영 ───── */
-  const world = useRef(null);
-  const els = useRef({});
+  const world = useRef<World | null>(null);
+  const els = useRef<Record<string, HTMLSpanElement | null>>({});
   const raf = useRef(0);
   const calm = useRef(0);
 
@@ -92,12 +109,17 @@ export default function Gacha() {
     if (raf.current) return;
     let last = performance.now();
     let acc = 0;
-    const tick = (now) => {
+    const tick = (now: number) => {
+      const w = world.current;
+      if (!w) {
+        raf.current = 0;
+        return;
+      }
       acc += Math.min(0.05, (now - last) / 1000);
       last = now;
       let speed = 0;
       while (acc >= 1 / 120) {
-        speed = Math.max(speed, step(world.current, 1 / 120));
+        speed = Math.max(speed, step(w, 1 / 120));
         acc -= 1 / 120;
       }
       paint();
@@ -112,12 +134,14 @@ export default function Gacha() {
   }, [paint]);
 
   const dropIn = useCallback(
-    (ids, settled = false) => {
+    (ids: CapsuleId[], settled = false) => {
+      const w = world.current;
+      if (!w) return;
       ids.forEach((id, k) => {
-        const c = byId(id);
+        const c = getCapsule(id);
         const x = (c.pos[0] / 100) * GLASS_W + (Math.random() * 16 - 8);
         const y = settled ? GLASS - c.pos[1] - BALL / 2 : -BALL - k * 70 - Math.random() * 30;
-        addBody(world.current, id, x, y, (Math.random() - 0.5) * 60, 0);
+        addBody(w, id, x, y, (Math.random() - 0.5) * 60, 0);
       });
       wake();
     },
@@ -134,8 +158,8 @@ export default function Gacha() {
     };
   }, [dropIn]);
 
-  const timers = useRef([]);
-  const later = (ms, fn) => timers.current.push(setTimeout(fn, ms));
+  const timers = useRef<Timer[]>([]);
+  const later = (ms: number, fn: () => void) => timers.current.push(setTimeout(fn, ms));
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   const idle = phase === 'idle';
@@ -143,11 +167,12 @@ export default function Gacha() {
 
   /** 집게: 가장 가까운 캡슐로 이동 → 내려가 잡기 → 올라와 출구로 → 떨어뜨리기. 실패 없음. */
   const grab = () => {
-    if (!idle || empty) return;
-    const bodies = world.current.bodies;
-    const xOf = (id) => (bodies.get(id).x / GLASS_W) * 100;
+    const w = world.current;
+    if (!idle || empty || !w) return;
+    const xOf = (id: CapsuleId) => ((w.bodies.get(id)?.x ?? 0) / GLASS_W) * 100;
     const target = [...pile].sort((a, b) => Math.abs(xOf(a) - clawX) - Math.abs(xOf(b) - clawX))[0];
-    const tb = bodies.get(target);
+    const tb = target && w.bodies.get(target);
+    if (!target || !tb) return;
     tb.pinned = true;
     tb.vx = 0;
     tb.vy = 0;
@@ -159,12 +184,12 @@ export default function Gacha() {
     later(420, () => setCable(cableFor(tb.y)));
     later(1180, () => {
       setOpen(false);
-      impulseAround(world.current, tb.x, tb.y, 150, 320); // 집게가 닿으면 주변 캡슐이 들썩
+      impulseAround(w, tb.x, tb.y, 150, 320); // 집게가 닿으면 주변 캡슐이 들썩
       wake();
     });
     later(1460, () => {
       setHeld(target);
-      removeBody(world.current, target); // 빠진 자리로 위 캡슐들이 떨어져요
+      removeBody(w, target); // 빠진 자리로 위 캡슐들이 떨어져요
       wake();
       setPile((p) => p.filter((k) => k !== target));
     });
@@ -196,21 +221,21 @@ export default function Gacha() {
     setClawX(50);
   };
 
-  const track = (e) => {
+  const track = (e: MouseEvent<HTMLButtonElement>) => {
     if (!idle) return;
     const r = e.currentTarget.getBoundingClientRect();
     setMoveMs(140);
     setClawX(clamp(((e.clientX - r.left) / r.width) * 100));
   };
 
-  const nudge = (d) => {
+  const nudge = (d: number) => {
     if (!idle) return;
     setMoveMs(200);
     setClawX((x) => clamp(x + d));
   };
 
   const openCapsule = useCallback(
-    (id) => {
+    (id: CapsuleId) => {
       setTray((t) => t.filter((k) => k !== id));
       collect(id);
       setOpened(id);
@@ -222,8 +247,8 @@ export default function Gacha() {
   const closeCol = useCallback(() => setShowCol(false), []);
 
   const gotCount = ALL_IDS.filter((k) => got[k]).length;
-  const heldCap = held && byId(held);
-  const fallCap = falling && byId(falling);
+  const heldCap = held ? getCapsule(held) : null;
+  const fallCap = falling ? getCapsule(falling) : null;
 
   return (
     <div className="page gacha-page">
@@ -291,7 +316,7 @@ export default function Gacha() {
                   if (el) paint();
                 }}
               >
-                <Capsule capsule={byId(id)} size={BALL} iconSize={34} soft={!CLEAR_GLASS} style={{ left: 0, top: 0 }} />
+                <Capsule capsule={getCapsule(id)} size={BALL} iconSize={34} soft={!CLEAR_GLASS} style={{ left: 0, top: 0 }} />
               </span>
             ))}
 
@@ -332,7 +357,7 @@ export default function Gacha() {
           <div className="controls">
             <div className="tray" aria-label="나온 캡슐">
               {tray.map((id) => {
-                const c = byId(id);
+                const c = getCapsule(id);
                 return (
                   <button key={id} type="button" className="trayball" onClick={() => openCapsule(id)} aria-label={`${c.tag} 열기`}>
                     <Capsule capsule={c} size={66} iconSize={26} />
@@ -367,7 +392,7 @@ export default function Gacha() {
       </section>
 
       {showCol && <CollectionSheet got={got} onOpen={openCapsule} onClose={closeCol} />}
-      {opened && <RevealNote capsule={byId(opened)} onClose={closeNote} />}
+      {opened && <RevealNote capsule={getCapsule(opened)} onClose={closeNote} />}
     </div>
   );
 }

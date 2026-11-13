@@ -1,12 +1,16 @@
 /* 자세히 보기 페이지의 시각 자료: 수치, 아키텍처, 흐름도, 결함 탐지표.
-   데이터는 src/data/capsules.js 의 stats / arch / flows / defects 에서 와요. */
+   데이터는 src/data/capsules.ts 의 stats / arch / flows / defects 에서 와요. */
+import type { Arch, Defects, FlowDiagram, Stat, StyleWithVars } from '../types';
 
-export function StatRow({ stats, color }) {
+/** --accent CSS 변수로 프로젝트 색을 넘겨요. */
+const accent = (color: string, extra: Record<`--${string}`, string | number> = {}): StyleWithVars => ({ '--accent': color, ...extra });
+
+export function StatRow({ stats, color }: { stats: Stat[]; color: string }) {
   return (
     <section className="f-stats" aria-label="주요 수치">
       {stats.map(([n, label, sub]) => (
         <div key={label} className="f-stat">
-          <p className="f-stat-n" style={{ '--accent': color }}>
+          <p className="f-stat-n" style={accent(color)}>
             {n}
           </p>
           <p className="f-stat-label">{label}</p>
@@ -17,7 +21,15 @@ export function StatRow({ stats, color }) {
   );
 }
 
-export function ArchDiagram({ arch, color, img, name }) {
+interface ArchDiagramProps {
+  arch: Arch;
+  color: string;
+  /** 있으면 그림으로, 없으면 HTML 도식으로 보여줘요. */
+  img?: string;
+  name: string;
+}
+
+export function ArchDiagram({ arch, color, img, name }: ArchDiagramProps) {
   if (img) {
     return (
       <section className="f-block" aria-label="서비스 아키텍처">
@@ -31,7 +43,7 @@ export function ArchDiagram({ arch, color, img, name }) {
   return (
     <section className="f-block" aria-label="서비스 아키텍처">
       <p className="f-kicker">Architecture</p>
-      <div className="arch" style={{ '--accent': color }}>
+      <div className="arch" style={accent(color)}>
         <div className="arch-left">
           <div className="arch-ci">
             {arch.ci.map((n, i) => (
@@ -77,12 +89,12 @@ export function ArchDiagram({ arch, color, img, name }) {
   );
 }
 
-export function Flow({ flow, color, index }) {
+export function Flow({ flow, color, index }: { flow: FlowDiagram; color: string; index: number }) {
   return (
     <section className="f-block" aria-label={flow.title}>
       <p className="f-kicker">Flow {String(index + 1).padStart(2, '0')}</p>
       <h2 className="f-title">{flow.title}</h2>
-      <ol className="flow" style={{ '--accent': color, '--n': flow.steps.length }}>
+      <ol className="flow" style={accent(color, { '--n': flow.steps.length })}>
         {flow.steps.map(([name, desc], i) => (
           <li key={name}>
             <span className="flow-no">{String(i + 1).padStart(2, '0')}</span>
@@ -92,7 +104,7 @@ export function Flow({ flow, color, index }) {
         ))}
       </ol>
       {flow.loop && (
-        <p className="flow-loop" style={{ '--accent': color }}>
+        <p className="flow-loop" style={accent(color)}>
           ↺ {flow.loop}
         </p>
       )}
@@ -110,13 +122,13 @@ export function Flow({ flow, color, index }) {
   );
 }
 
-export function DefectTable({ defects, color }) {
+export function DefectTable({ defects, color }: { defects: Defects; color: string }) {
   const total = defects.rows.length;
   return (
     <section className="f-block defects" aria-label={defects.title}>
       <div className="defects-left">
         <p className="f-kicker">Failure analysis</p>
-        <p className="defects-big" style={{ '--accent': color }}>
+        <p className="defects-big" style={accent(color)}>
           {total}
           <span>/</span>
           {total}

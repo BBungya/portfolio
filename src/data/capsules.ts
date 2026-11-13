@@ -12,6 +12,7 @@ import dongnePost from '../assets/shots/dongne-2-post.webp';
 import dongneMap from '../assets/shots/dongne-3-map.webp';
 import archSign from '../assets/arch/arch-sign.svg';
 import archChick from '../assets/arch/arch-chick.svg';
+import type { Capsule, CapsuleId, ProjectCapsule } from '../types';
 
 /**
  * 뽑기 기계 안의 캡슐 6개.
@@ -19,7 +20,7 @@ import archChick from '../assets/arch/arch-chick.svg';
  * - pos: [x(%), bottom(px), 회전(deg)] — 유리창 안 위치
  * - type: 'project'면 자세히 보기 페이지가 있고, 'about'이면 About으로 연결
  */
-export const CAPSULES = [
+export const CAPSULES: Capsule[] = [
   {
     id: 'chick',
     type: 'project',
@@ -235,10 +236,19 @@ export const CAPSULES = [
   },
 ];
 
-export const PROJECTS = CAPSULES.filter((c) => c.type === 'project');
-export const byId = (id) => CAPSULES.find((c) => c.id === id);
+export const PROJECTS: ProjectCapsule[] = CAPSULES.filter((c): c is ProjectCapsule => c.type === 'project');
 
-export const capsuleFill = (c) =>
+/** 주소창의 id처럼 아무 문자열이나 받을 수 있어서, 없으면 undefined를 돌려줘요. */
+export const byId = (id: string | undefined): Capsule | undefined => CAPSULES.find((c) => c.id === id);
+
+/** 데이터에 반드시 있는 id로 캡슐을 꺼내요. (뽑기 기계 안처럼 id가 확실할 때) */
+export const getCapsule = (id: CapsuleId): Capsule => {
+  const c = byId(id);
+  if (!c) throw new Error(`캡슐 데이터가 없어요: ${id}`);
+  return c;
+};
+
+export const capsuleFill = (c: Pick<Capsule, 'colors'>): string =>
   `radial-gradient(circle at 34% 28%, ${c.colors[0]} 0%, ${c.colors[1]} 42%, ${c.colors[2]} 100%)`;
-export const capsuleTopFill = (c) =>
+export const capsuleTopFill = (c: Pick<Capsule, 'colors'>): string =>
   `radial-gradient(120% 140% at 35% 20%, ${c.colors[0]} 0%, ${c.colors[1]} 45%, ${c.colors[2]} 100%)`;

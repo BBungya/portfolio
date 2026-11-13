@@ -2,19 +2,48 @@
  * 아주 작은 2D 원형 물리 엔진 (캡슐 전용).
  * 중력 · 원끼리 충돌 · 벽/바닥 반사 · 굴러가는 회전만 다뤄요.
  */
-export function createWorld({ width, height, radius, left = 0, right = width }) {
+
+export interface Body {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  /** 회전 각도(deg) */
+  a: number;
+  /** 집게에 잡혀 고정된 상태 */
+  pinned: boolean;
+}
+
+export interface World {
+  W: number;
+  H: number;
+  r: number;
+  left: number;
+  right: number;
+  bodies: Map<string, Body>;
+}
+
+interface WorldOptions {
+  width: number;
+  height: number;
+  radius: number;
+  left?: number;
+  right?: number;
+}
+
+export function createWorld({ width, height, radius, left = 0, right = width }: WorldOptions): World {
   return { W: width, H: height, r: radius, left, right, bodies: new Map() };
 }
 
-export function addBody(world, id, x, y, vx = 0, vy = 0) {
+export function addBody(world: World, id: string, x: number, y: number, vx = 0, vy = 0): void {
   world.bodies.set(id, { x, y, vx, vy, a: Math.random() * 40 - 20, pinned: false });
 }
 
-export function removeBody(world, id) {
+export function removeBody(world: World, id: string): void {
   world.bodies.delete(id);
 }
 
-export function impulseAround(world, x, y, radius, strength) {
+export function impulseAround(world: World, x: number, y: number, radius: number, strength: number): void {
   world.bodies.forEach((b) => {
     if (b.pinned) return;
     const dx = b.x - x;
@@ -34,7 +63,7 @@ const BOUNCE_BALL = 0.18;
 const FLOOR_FRICTION = 0.9;
 
 /** dt초만큼 진행하고, 가장 빠른 속도를 돌려줘요 (잠들기 판단용). */
-export function step(world, dt) {
+export function step(world: World, dt: number): number {
   const { r, H, left, right } = world;
   const list = [...world.bodies.values()];
   let maxSpeed = 0;

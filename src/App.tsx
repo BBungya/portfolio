@@ -1,24 +1,33 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import Gacha from './pages/Gacha.jsx';
-import ProjectDetail from './pages/ProjectDetail.jsx';
-import About from './pages/About.jsx';
+import type { CapsuleId, Collected } from './types';
+import Gacha from './pages/Gacha';
+import ProjectDetail from './pages/ProjectDetail';
+import About from './pages/About';
 
 /** 열어본 캡슐 목록 — 페이지를 오가도 유지되고, 새로고침해도 기억해요. */
-const CollectionContext = createContext(null);
+interface CollectionValue {
+  got: Collected;
+  collect: (id: CapsuleId) => void;
+}
+
+const CollectionContext = createContext<CollectionValue | null>(null);
 const STORAGE_KEY = 'gacha:collected';
 
-function readStored() {
+function readStored(): Collected {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
+    const parsed: unknown = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? (parsed as Collected) : {};
   } catch {
     return {};
   }
 }
 
-export function useCollection() {
-  return useContext(CollectionContext);
+export function useCollection(): CollectionValue {
+  const value = useContext(CollectionContext);
+  if (!value) throw new Error('useCollection은 <App> 안에서만 쓸 수 있어요.');
+  return value;
 }
 
 function ScrollToTop() {
@@ -30,7 +39,7 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  const [got, setGot] = useState(readStored);
+  const [got, setGot] = useState<Collected>(readStored);
 
   useEffect(() => {
     try {
@@ -40,7 +49,7 @@ export default function App() {
     }
   }, [got]);
 
-  const collect = useCallback((id) => setGot((prev) => (prev[id] ? prev : { ...prev, [id]: true })), []);
+  const collect = useCallback((id: CapsuleId) => setGot((prev) => (prev[id] ? prev : { ...prev, [id]: true })), []);
 
   return (
     <CollectionContext.Provider value={{ got, collect }}>

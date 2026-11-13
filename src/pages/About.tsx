@@ -1,7 +1,8 @@
-import Nav from '../components/Nav.jsx';
+import type { ReactNode } from 'react';
+import Nav from '../components/Nav';
 import '../styles/about.css';
 
-const SKILLS = [
+const SKILLS: [area: string, list: string][] = [
   ['Backend', 'Java, Spring Boot, Spring Security, JWT, JPA, PostgreSQL, MySQL, SQL'],
   ['Infra', 'AWS (EC2, RDS, S3), CI/CD, Vercel'],
   ['Mobile / Front', 'Kotlin, Android, React, HTML, CSS'],
@@ -10,13 +11,13 @@ const SKILLS = [
   ['Collaboration', 'Notion, Discord, Slack, Gather Town'],
 ];
 
-const UMC = [
+const UMC: [role: string, desc: string][] = [
   ['9기 · 회장', '운영진 8명에게 직책별 업무와 기한을 나누고 Notion으로 진행 상황을 공유했어요. 운영 문서는 다음 기수에 인계했어요.'],
   ['7 · 8기 · Android 파트장', '신입 6명을 위해 API 연동·Git 워크북 부록을 만들고, 브랜치 생성부터 병합까지 실습을 진행했어요.'],
   ['기술지원 TF', '2개 팀의 코드 리뷰와 API 연결을 지원해, 두 팀 모두 데모데이까지 프로젝트를 완성했어요.'],
 ];
 
-const AWARDS = [
+const AWARDS: [name: string, date: string][] = [
   ['데이터아키텍처 준전문가 (DAsP)', '2026.10'],
   ['TOEIC 800', '2026.08'],
   ['SQL 개발자 (SQLD)', '2025.04'],
@@ -25,7 +26,14 @@ const AWARDS = [
 
 const COURSES = ['데이터베이스개론', '자료구조', '알고리즘', '운영체제', '시스템프로그래밍', '네트워크', '웹프로그래밍', '웹/코드보안', '소프트웨어공학'];
 
-function Block({ label, children, last }) {
+interface BlockProps {
+  label: string;
+  children: ReactNode;
+  /** 마지막 블록이면 아래 구분선을 없애요. */
+  last?: boolean;
+}
+
+function Block({ label, children, last = false }: BlockProps) {
   return (
     <section className={`a-block ${last ? 'last' : ''}`}>
       <h2 className="a-label">{label}</h2>
@@ -34,7 +42,7 @@ function Block({ label, children, last }) {
   );
 }
 
-function Line({ title, meta }) {
+function Line({ title, meta }: { title: ReactNode; meta?: ReactNode }) {
   return (
     <div className="a-line">
       <p className="a-big">{title}</p>

@@ -1,13 +1,20 @@
 import { useEffect } from 'react';
-import { CAPSULES } from '../data/capsules.js';
-import Capsule from './Capsule.jsx';
+import { CAPSULES } from '../data/capsules';
+import Capsule from './Capsule';
+import type { CapsuleId, Collected } from '../types';
+
+interface CollectionSheetProps {
+  got: Collected;
+  onOpen: (id: CapsuleId) => void;
+  onClose: () => void;
+}
 
 /** Collection 버튼으로 여는 목록. 열어본 캡슐만 선명하고, 나머지는 흐릿하게 가려져요. */
-export default function CollectionSheet({ got, onOpen, onClose }) {
+export default function CollectionSheet({ got, onOpen, onClose }: CollectionSheetProps) {
   const count = CAPSULES.filter((c) => got[c.id]).length;
 
   useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);

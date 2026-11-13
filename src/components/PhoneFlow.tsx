@@ -1,4 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import type { PrototypeFlow, StyleWithVars } from '../types';
+
+interface PhoneFlowProps {
+  flow: PrototypeFlow;
+  color: string;
+}
 
 /**
  * 직접 눌러보는 미니 프로토타입.
@@ -7,13 +13,13 @@ import { useEffect, useRef, useState } from 'react';
  */
 const AUTO_MS = 2600;
 
-export default function PhoneFlow({ flow, color }) {
+export default function PhoneFlow({ flow, color }: PhoneFlowProps) {
   const { screens, landscape, title } = flow;
   const [i, setI] = useState(0);
   const [auto, setAuto] = useState(true);
   const [visible, setVisible] = useState(false);
   const [tapFx, setTapFx] = useState(0);
-  const ref = useRef(null);
+  const ref = useRef<HTMLElement>(null);
   const last = screens.length - 1;
 
   // 화면에 보일 때만 자동 재생
@@ -23,7 +29,7 @@ export default function PhoneFlow({ flow, color }) {
       setVisible(true);
       return undefined;
     }
-    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.35 });
+    const io = new IntersectionObserver(([e]) => setVisible(Boolean(e?.isIntersecting)), { threshold: 0.35 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -46,7 +52,7 @@ export default function PhoneFlow({ flow, color }) {
     });
   }, [screens]);
 
-  const go = (n) => {
+  const go = (n: number) => {
     setAuto(false);
     setI(n);
   };
@@ -56,12 +62,13 @@ export default function PhoneFlow({ flow, color }) {
   };
 
   const s = screens[i];
+  const accentStyle: StyleWithVars = { '--accent': color };
 
   return (
-    <section ref={ref} className={`pf ${landscape ? 'land' : ''}`} style={{ '--accent': color }} aria-label={`${title} 프로토타입`}>
+    <section ref={ref} className={`pf ${landscape ? 'land' : ''}`} style={accentStyle} aria-label={`${title} 프로토타입`}>
       <div className="pf-device">
         <div className="pf-screen">
-          <img key={s.src} src={s.src} alt={`${s.label} 화면`} className="pf-img" draggable="false" />
+          <img key={s.src} src={s.src} alt={`${s.label} 화면`} className="pf-img" draggable={false} />
           {s.hot && (
             <span
               key={`hot-${i}-${tapFx}`}

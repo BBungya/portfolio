@@ -1,9 +1,16 @@
 /* 자세히 보기의 '직접 눌러보는' 프로토타입 흐름.
    hot: 다음 화면으로 넘어가는 탭 위치 [x, y] (화면 기준 0~1). null이면 마지막 화면. */
-const files = import.meta.glob('../assets/flows/*.webp', { eager: true, import: 'default' });
-const img = (name) => files[`../assets/flows/${name}`];
+import type { PrototypeFlow, ProjectId } from '../types';
 
-export const FLOWS = {
+const files = import.meta.glob<string>('../assets/flows/*.webp', { eager: true, import: 'default' });
+
+const img = (name: string): string => {
+  const src = files[`../assets/flows/${name}`];
+  if (!src) throw new Error(`프로토타입 이미지가 없어요: ${name}`);
+  return src;
+};
+
+export const FLOWS: Partial<Record<ProjectId, PrototypeFlow>> = {
   card: {
     title: '멤버십 등록하기',
     landscape: false,

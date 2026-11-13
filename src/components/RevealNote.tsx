@@ -1,20 +1,25 @@
 import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { capsuleTopFill } from '../data/capsules.js';
+import { capsuleTopFill } from '../data/capsules';
+import type { Capsule } from '../types';
+
+interface RevealNoteProps {
+  capsule: Capsule;
+  onClose: () => void;
+}
 
 /** 캡슐이 열리면서 쪽지가 펴지는 전체 화면 연출. */
-export default function RevealNote({ capsule, onClose }) {
+export default function RevealNote({ capsule, onClose }: RevealNoteProps) {
   const navigate = useNavigate();
-  const closeRef = useRef(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     closeRef.current?.focus({ preventScroll: true });
-    const onKey = (e) => e.key === 'Escape' && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const isProject = capsule.type === 'project';
 
   return (
     <div className="reveal" role="dialog" aria-modal="true" aria-label={capsule.name}>
@@ -32,7 +37,7 @@ export default function RevealNote({ capsule, onClose }) {
             </div>
             <h2 className="note-title">{capsule.name}</h2>
             <p className="note-text">{capsule.summary}</p>
-            {isProject && (
+            {capsule.type === 'project' && (
               <dl className="meta-list">
                 <dt>역할</dt>
                 <dd>{capsule.role}</dd>
@@ -48,7 +53,7 @@ export default function RevealNote({ capsule, onClose }) {
               <button ref={closeRef} type="button" className="pill" onClick={onClose}>
                 닫기
               </button>
-              {isProject ? (
+              {capsule.type === 'project' ? (
                 <button type="button" className="pill fill" onClick={() => navigate(`/projects/${capsule.id}`)}>
                   자세히 보기
                 </button>

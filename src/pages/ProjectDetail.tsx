@@ -1,9 +1,9 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { PROJECTS, byId, capsuleFill } from '../data/capsules.js';
-import Nav from '../components/Nav.jsx';
-import { ArchDiagram, DefectTable, Flow, StatRow } from '../components/ProjectFigures.jsx';
-import PhoneFlow from '../components/PhoneFlow.jsx';
-import { FLOWS } from '../data/flows.js';
+import { PROJECTS, byId, capsuleFill } from '../data/capsules';
+import Nav from '../components/Nav';
+import { ArchDiagram, DefectTable, Flow, StatRow } from '../components/ProjectFigures';
+import PhoneFlow from '../components/PhoneFlow';
+import { FLOWS } from '../data/flows';
 import '../styles/project.css';
 
 export default function ProjectDetail() {
@@ -15,6 +15,7 @@ export default function ProjectDetail() {
   const prev = PROJECTS[(i + PROJECTS.length - 1) % PROJECTS.length];
   const next = PROJECTS[(i + 1) % PROJECTS.length];
   const no = String(i + 1).padStart(2, '0');
+  const proto = FLOWS[p.id];
 
   return (
     <div className="page project-page">
@@ -72,7 +73,7 @@ export default function ProjectDetail() {
           </div>
         </dl>
 
-        {FLOWS[p.id] && <PhoneFlow key={p.id} flow={FLOWS[p.id]} color={p.colors[1]} />}
+        {proto && <PhoneFlow key={p.id} flow={proto} color={p.colors[1]} />}
 
         {p.stats && <StatRow stats={p.stats} color={p.colors[2]} />}
         {p.arch && <ArchDiagram arch={p.arch} color={p.colors[1]} img={p.archImg} name={p.name} />}
@@ -80,7 +81,7 @@ export default function ProjectDetail() {
         {p.defects && <DefectTable defects={p.defects} color={p.colors[2]} />}
 
         {/* 스크린샷: src/assets/shots/ 에 이미지를 넣고 아래 칸을 <img>로 바꿔주세요 */}
-        {!FLOWS[p.id] && (
+        {!proto && (
         <section className="p-shots" aria-label="스크린샷">
           {p.shots
             ? p.shots.map(([src, alt]) => (

@@ -41,7 +41,7 @@ export default function ProjectDetail() {
         <section className="p-hero">
           <div className="p-hero-text">
             <p className="muted small">
-              {p.tag} · Project {no}
+              {p.tag}, Project {no}
             </p>
             <h1 className="p-title">{p.name}</h1>
             <p className="p-summary">{p.summary}</p>
@@ -60,7 +60,7 @@ export default function ProjectDetail() {
             <dd>{p.role}</dd>
           </div>
           <div>
-            <dt>출처</dt>
+            <dt>활동</dt>
             <dd>{p.from}</dd>
           </div>
           <div>
@@ -72,6 +72,18 @@ export default function ProjectDetail() {
             <dd>{p.period}</dd>
           </div>
         </dl>
+
+        <section className="p-story" aria-label="프로젝트 이야기">
+          {p.story.map(([title, body], k) => (
+            <div key={title} className="p-story-row">
+              <p className="p-num">{String(k + 1).padStart(2, '0')}</p>
+              <div>
+                <h2>{title}</h2>
+                <p>{body}</p>
+              </div>
+            </div>
+          ))}
+        </section>
 
         {proto && <PhoneFlow key={p.id} flow={proto} color={p.colors[1]} />}
 
@@ -99,17 +111,6 @@ export default function ProjectDetail() {
         </section>
         )}
 
-        <section className="p-story" aria-label="프로젝트 이야기">
-          {p.story.map(([title, body], k) => (
-            <div key={title} className="p-story-row">
-              <p className="p-num">{String(k + 1).padStart(2, '0')}</p>
-              <div>
-                <h2>{title}</h2>
-                <p>{body}</p>
-              </div>
-            </div>
-          ))}
-        </section>
 
         <div className="p-links">
           {p.links.repo && (

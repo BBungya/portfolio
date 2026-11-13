@@ -35,7 +35,7 @@ export function ArchDiagram({ arch, color, img, name }: ArchDiagramProps) {
       <section className="f-block" aria-label="서비스 아키텍처">
         <p className="f-kicker">Architecture</p>
         <div className="arch-figure">
-          <img src={img} alt={`${name} 서비스 아키텍처: GitHub Actions로 빌드해 EC2에 배포하고, Spring Boot 서버가 데이터베이스·S3·외부 서비스와 연동하는 구조`} />
+          <img src={img} alt={`${name} 서비스 아키텍처: GitHub Actions로 빌드해 EC2에 배포하고, Spring Boot 서버가 데이터베이스, S3, 외부 서비스와 연동하는 구조`} />
         </div>
       </section>
     );

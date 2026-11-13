@@ -41,9 +41,9 @@ export default function RevealNote({ capsule, onClose }: RevealNoteProps) {
               <dl className="meta-list">
                 <dt>역할</dt>
                 <dd>{capsule.role}</dd>
-                <dt>출처</dt>
+                <dt>활동</dt>
                 <dd>
-                  {capsule.from} · {capsule.period}
+                  {capsule.from}, {capsule.period}
                 </dd>
                 <dt>스택</dt>
                 <dd>{capsule.stackShort}</dd>

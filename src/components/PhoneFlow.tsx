@@ -84,7 +84,7 @@ export default function PhoneFlow({ flow, color }: PhoneFlowProps) {
       <div className="pf-side">
         <p className="f-kicker">Prototype</p>
         <h2 className="f-title">{title}</h2>
-        <p className="muted small pf-hint">{auto ? '자동 재생 중 · 화면을 누르면 직접 넘겨볼 수 있어요' : '깜빡이는 곳을 눌러 다음 화면으로'}</p>
+        <p className="muted small pf-hint">{auto ? '자동으로 넘어가는 중이에요. 화면을 누르면 직접 넘겨볼 수 있어요' : '깜빡이는 곳을 눌러 다음 화면으로'}</p>
         <ol className="pf-steps">
           {screens.map((st, k) => (
             <li key={st.src}>

@@ -422,11 +422,35 @@ button.row:hover {
 .row .r {
   text-align: right;
 }
-.row.hidden .t,
-.row.hidden .d {
-  filter: blur(7px);
-  color: #9a9a9a;
-  user-select: none;
+.row .r {
+  display: grid;
+  justify-items: end;
+}
+.row .r > span {
+  grid-area: 1 / 1;
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+.row .r-open {
+  color: var(--ink);
+  opacity: 0;
+  transform: translateX(-6px);
+}
+.row.unseen:hover .r-role,
+.row.unseen:focus-visible .r-role {
+  opacity: 0;
+}
+.row.unseen:hover .r-open,
+.row.unseen:focus-visible .r-open {
+  opacity: 1;
+  transform: none;
+}
+.row .dot .cap .ic {
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .row .r > span {
+    transition: none;
+  }
 }
 .row .dot {
   position: relative;
